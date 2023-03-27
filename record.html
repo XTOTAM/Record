@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Player Table</title>
+	<script>
+		// Define an array of player objects with default names and scores
+		var players = [
+			{ name: "Player 1", scores: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0] },
+			{ name: "Player 2", scores: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0] },
+			{ name: "Player 3", scores: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0] }
+		];
+
+		// Save the player data to local storage
+		function saveData() {
+			localStorage.setItem("players", JSON.stringify(players));
+		}
+
+		// Load the player data from local storage
+		function loadData() {
+			var data = localStorage.getItem("players");
+			if (data) {
+				players = JSON.parse(data);
+				generateTable();
+			}
+		}
+
+		// Generate the table with the current player data
+		function generateTable() {
+			// Get a reference to the table element
+			var table = document.getElementById("scoreTable");
+
+			// Clear the existing table rows
+			table.innerHTML = "";
+
+			// Add a header row with labels for each round
+			var headerRow = table.insertRow();
+			var nameHeader = headerRow.insertCell();
+			nameHeader.innerHTML = "<b>Name</b>";
+			for (var i = 1; i <= 10; i++) {
+				var roundHeader = headerRow.insertCell();
+				roundHeader.innerHTML = "<b>Round " + i + "</b>";
+			}
+
+			// Add a row for each player with their name and score for each round
+			for (var i = 0; i < players.length; i++) {
+				var player = players[i];
+				var row = table.insertRow();
+
+				// Add a cell with the player's name and an input for editing it
+				var nameCell = row.insertCell();
+				var nameInput = document.createElement("input");
+				nameInput.type = "text";
+				nameInput.value = player.name;
+				nameInput.onchange = function() {
+					var row = this.parentNode.parentNode;
+					var playerIndex = row.rowIndex - 1;
+					players[playerIndex].name = this.value;
+				};
+				nameCell.appendChild(nameInput);
+
+				// Loop through each round and create a cell for the player's score
+				for (var j = 0; j < 10; j++) {
+					var scoreCell = row.insertCell();
+					var scoreInput = document.createElement("input");
+					scoreInput.type = "number";
+					scoreInput.min = 0;
+					scoreInput.max = 100;
+					scoreInput.value = player.scores[j];
+					scoreInput.onchange = function() {
+						var row = this.parentNode.parentNode;
+						var playerIndex = row.rowIndex - 1;
+						var roundIndex = this.parentNode.cellIndex - 1;
+						players[playerIndex].scores[roundIndex] = parseInt(this.value);
+					};
+					scoreCell.appendChild(scoreInput);
+				}
+			}
+		}
+
+		// Add a new player to the table with a default name and score of 0 for
+
+function addPlayer() {
+		var defaultName = "Player " + (players.length + 1);
+		var newPlayer = {
+			name: defaultName,
+			scores: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+		};
+		players.push(newPlayer);
+		saveData();
+		generateTable();
+	}
+
+	// Clear the player data from local storage and regenerate the table
+	function clearStorage() {
+		localStorage.clear();
+		players = [			{ name: "Player 1", scores: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0] },
+			{ name: "Player 2", scores: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0] },
+			{ name: "Player 3", scores: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0] }
+		];
+		generateTable();
+	}
+</script>
+</head>
+<body onload="loadData()">
+	<h1>Player Table</h1>
+	<table id="scoreTable" border="1"></table>
+	<button onclick="addPlayer()">Add Player</button>
+	<button onclick="saveData()">Save</button>
+	<button onclick="loadData()">Load</button>
+	<button onclick="clearStorage()">Clear Storage</button>
+</body>
+</html>
