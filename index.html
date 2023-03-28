@@ -64,20 +64,23 @@
                 const barElement = document.getElementById('bar');
 
                 if (previousPrice !== null) {
-                    const percentageChange = ((currentPrice - previousPrice) / previousPrice) * 100;
+                    const priceChange = currentPrice - previousPrice;
+                    const percentageChange = (priceChange / previousPrice) * 100;
                     const scaleFactor = 1 + (Math.abs(percentageChange) / 100);
 
-                    if (currentPrice > previousPrice) {
+                    const barHeight = Math.min(100, Math.abs(priceChange) * 10);
+
+                    if (priceChange > 0) {
                         priceElement.style.color = 'green';
                         priceElement.style.transform = `scale(${scaleFactor})`;
 
-                        barElement.style.height = `${Math.min(100, scaleFactor * 50)}px`;
+                        barElement.style.height = `${barHeight}px`;
                         barElement.style.backgroundColor = 'green';
-                    } else if (currentPrice < previousPrice) {
+                    } else if (priceChange < 0) {
                         priceElement.style.color = 'red';
                         priceElement.style.transform = `scale(${1 / scaleFactor})`;
 
-                        barElement.style.height = `${Math.min(100, scaleFactor * 50)}px`;
+                        barElement.style.height = `${barHeight}px`;
                         barElement.style.backgroundColor = 'red';
                     } else {
                         priceElement.style.color = 'black';
@@ -96,8 +99,7 @@
         }
 
         fetchPrice();
-        setInterval(fetchPrice
-        , 1000); // Update the price every second (1000 ms)
+        setInterval(fetchPrice, 1000); // Update the price every second (1000 ms)
     </script>
 </body>
 </html>
