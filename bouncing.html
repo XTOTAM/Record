@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Crypto Coins Bouncing</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+    }
+
+    .coin {
+      position: absolute;
+      width: 50px;
+      height: 50px;
+    }
+  </style>
+</head>
+<body>
+  <img src="dgd.png" alt="Bitcoin" class="coin" id="bitcoin">
+  <img src="eos.png" alt="Ethereum" class="coin" id="ethereum">
+  <img src="edo.png" alt="bla" class="coin" id="bla">
+  <img src="eop.png" alt="cul" class="coin" id="cul">
+
+  <script>
+    class BouncingCoin {
+      constructor(element) {
+        this.element = element;
+        this.vx = Math.random() * 2 - 1;
+        this.vy = Math.random() * 2 - 1;
+        this.x = Math.random() * (window.innerWidth - this.element.clientWidth);
+        this.y = Math.random() * (window.innerHeight - this.element.clientHeight);
+        this.updatePosition();
+      }
+
+      updatePosition() {
+        this.element.style.left = this.x + 'px';
+        this.element.style.top = this.y + 'px';
+      }
+
+      move() {
+        this.x += this.vx;
+        this.y += this.vy;
+
+        if (this.x < 0 || this.x > window.innerWidth - this.element.clientWidth) {
+          this.vx *= -1;
+        }
+
+        if (this.y < 0 || this.y > window.innerHeight - this.element.clientHeight) {
+          this.vy *= -1;
+        }
+
+        this.updatePosition();
+      }
+    }
+
+    const bitcoin = new BouncingCoin(document.getElementById('bitcoin'));
+    const ethereum = new BouncingCoin(document.getElementById('ethereum'));
+    const bla = new BouncingCoin(document.getElementById('bla'));
+    const cul = new BouncingCoin(document.getElementById('cul'));
+
+    function animate() {
+      bitcoin.move();
+      ethereum.move();
+      bla.move();
+      cul.move();
+      requestAnimationFrame(animate);
+    }
+
+    animate();
+  </script>
+</body>
+</html>
