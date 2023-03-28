@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BTCUSDT Price</title>
+  <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f7f7f7;
+        }
+        .container {
+            text-align: center;
+        }
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+        .price-wrapper {
+            display: flex;
+            align-items: center;
+        }
+        p {
+            font-size: 1.25rem;
+            transition: color 0.5s, transform 0.5s;
+        }
+        .bar {
+            width: 3px;
+            height: 0;
+            background-color: transparent;
+            margin-left: 10px;
+            transition: height 0.5s, background-color 0.5s;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+  <h1>BTCUSDT Price</h1>
+  <div class="price-wrapper">
+    <p id="price">Loading...</p>
+    <div id="bar" class="bar"></div>
+  </div>
+</div>
+
+<script>
+        const API_URL = 'https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT';
+
+        let previousPrice = null;
+
+        async function fetchPrice() {
+            try {
+                const response = await fetch(API_URL);
+                if (!response.ok) {
+                    throw new Error(`HTTP error: ${response.status}`);
+                }
+                const data = await response.json();
+                const currentPrice = parseFloat(data.price).toFixed(2);
+                const priceElement = document.getElementById('price');
+                const barElement = document.getElementById('bar');
+
+                if (previousPrice !== null) {
+                    const percentageChange = ((currentPrice - previousPrice) / previousPrice) * 100;
+                    const scaleFactor = 1 + (Math.abs(percentageChange) / 100);
+
+                    if (currentPrice > previousPrice) {
+                        priceElement.style.color = 'green';
+                        priceElement.style.transform = `scale(${scaleFactor})`;
+
+                        barElement.style.height = `${Math.min(100, scaleFactor * 50)}px`;
+                        barElement.style.backgroundColor = 'green';
+                    } else if (currentPrice < previousPrice) {
+                        priceElement.style.color = 'red';
+                        priceElement.style.transform = `scale(${1 / scaleFactor})`;
+
+                        barElement.style.height = `${Math.min(100, scaleFactor * 50)}px`;
+                        barElement.style.backgroundColor = 'red';
+                    } else {
+                        priceElement.style.color = 'black';
+                        priceElement.style.transform = 'scale(1)';
+                        barElement.style.height = '0';
+                        barElement.style.backgroundColor = 'transparent';
+                    }
+                }
+
+                priceElement.textContent = `Price: $${currentPrice}`;
+                previousPrice = currentPrice;
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                document.getElementById('price').textContent = 'Error fetching data';
+            }
+        }
+
+        fetchPrice();
+        setInterval(fetchPrice
+        , 1000); // Update the price every second (1000 ms)
+    </script>
+</body>
+</html>
