@@ -82,13 +82,54 @@ function onWheel(event) {
   fractalPos.y = (mouse.y * 3.0) / material.uniforms.zoom.value + material.uniforms.center.value.y;
 
   const delta = Math.sign(event.deltaY);
-  const zoomFactor = 1.1;
-  material.uniforms.zoom.value *= delta > 0 ? zoomFactor : 1 / zoomFactor;
+  const zoomFactor = delta < 0 ? 1.1 : 1 / 1.1;
 
-  // Update the center based on the mouse pointer coordinates
-  material.uniforms.center.value.lerp(fractalPos, delta > 0 ? 1 - 1 / zoomFactor : 1 - zoomFactor);
+  // Update the center based on the mouse pointer coordinates before updating the zoom value
+  material.uniforms.center.value.x = (fractalPos.x * (zoomFactor - 1) + material.uniforms.center.value.x) / zoomFactor;
+  material.uniforms.center.value.y = (fractalPos.y * (zoomFactor - 1) + material.uniforms.center.value.y) / zoomFactor;
+
+  // Update the zoom value
+  material.uniforms.zoom.value *= zoomFactor;
 }
 
+
+
+
+
+let isDragging = false;
+let prevMousePos = new THREE.Vector2();
+
+function onMouseDown(event) {
+  isDragging = true;
+  prevMousePos.x = event.clientX;
+  prevMousePos.y = event.clientY;
+}
+
+function onMouseMove(event) {
+  if (!isDragging) return;
+
+  const deltaX = event.clientX - prevMousePos.x;
+  const deltaY = event.clientY - prevMousePos.y;
+
+  const fractalDelta = new THREE.Vector2(
+    (-deltaX / window.innerWidth) * 6.0 / material.uniforms.zoom.value,
+    (deltaY / window.innerHeight) * 6.0 / material.uniforms.zoom.value
+  );
+
+  material.uniforms.center.value.add(fractalDelta);
+
+  prevMousePos.x = event.clientX;
+  prevMousePos.y = event.clientY;
+}
+
+function onMouseUp() {
+  isDragging = false;
+}
+
+renderer.domElement.addEventListener('mousedown', onMouseDown);
+renderer.domElement.addEventListener('mousemove', onMouseMove);
+renderer.domElement.addEventListener('mouseup', onMouseUp);
+renderer.domElement.addEventListener('mouseleave', onMouseUp);
 renderer.domElement.addEventListener('wheel', onWheel, { passive: false });
 
 function animate() {
