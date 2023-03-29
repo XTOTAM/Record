@@ -28,7 +28,8 @@ const material = new THREE.ShaderMaterial({
     const float escapeRadius = 4.0;
 
     vec3 colorize(float t) {
-      return vec3(0.5 * cos(6.28318 * (t + 0.0)) + 0.5, 0.5 * cos(6.28318 * (t + 0.33)) + 0.5, 0.5 * cos(6.28318 * (t + 0.67)) + 0.5);
+      vec3 color = vec3(0.5 * cos(6.28318 * (t + 0.0)) + 0.5, 0.5 * cos(6.28318 * (t + 0.33)) + 0.5, 0.5 * cos(6.28318 * (t + 0.67)) + 0.5);
+      return vec3(1.0) - color;
     }
 
     void main() {
