@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Random Animation with WebGL</title>
+    <meta charset="utf-8">
+    <style>
+        canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gl-matrix/2.8.1/gl-matrix-min.js"></script>
+
+    <script type="x-shader/x-vertex" id="vertexShader">
+        attribute vec3 aPosition;
+
+        uniform mat4 uModelMatrix;
+        uniform mat4 uViewMatrix;
+        uniform mat4 uProjectionMatrix;
+
+        void main() {
+            gl_Position = uProjectionMatrix * uViewMatrix * uModelMatrix * vec4(aPosition, 1.0);
+        }
+    </script>
+
+    <script type="x-shader/x-fragment" id="fragmentShader">
+        precision mediump float;
+
+        uniform vec4 uColor;
+
+        void main() {
+            gl_FragColor = uColor;
+        }
+    </script>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const gl = canvas.getContext('webgl');
+
+        if (!gl) {
+            alert('WebGL is not supported');
+        }
+
+        const vertexShaderSource = document.getElementById('vertexShader').textContent;
+        const fragmentShaderSource = document.getElementById('fragmentShader').textContent;
+
+        const vertexShader = gl.createShader(gl.VERTEX_SHADER);
+        gl.shaderSource(vertexShader, vertexShaderSource);
+        gl.compileShader(vertexShader);
+
+        if (!gl.getShaderParameter(vertexShader, gl.COMPILE_STATUS)) {
+            console.error(gl.getShaderInfoLog(vertexShader));
+        }
+
+        const fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
+        gl.shaderSource(fragmentShader, fragmentShaderSource);
+        gl.compileShader(fragmentShader);
+
+        if (!gl.getShaderParameter(fragmentShader, gl.COMPILE_STATUS)) {
+            console.error(gl.getShaderInfoLog(fragmentShader));
+        }
+
+        const program = gl.createProgram();
+        gl.attachShader(program, vertexShader);
+        gl.attachShader(program, fragmentShader);
+        gl.linkProgram(program);
+
+        if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+            console.error(gl.getProgramInfoLog(program));
+        }
+
+        gl.useProgram(program);
+
+        const positionAttributeLocation = gl.getAttribLocation(program, 'aPosition');
+        const modelUniformLocation = gl.getUniformLocation(program, 'uModelMatrix');
+        const viewUniformLocation = gl.getUniformLocation(program, 'uViewMatrix');
+        const projectionUniformLocation = gl.getUniformLocation(program, 'uProjectionMatrix');
+        const colorUniformLocation = gl.getUniformLocation(program, 'uColor');
+
+        const vertices = [
+            -0.5, 0.5, 0.0,
+            -0.5, -0.5, 0.0,
+            0.5, -0.5, 0.0,
+            0.5, 0.5, 0.0,
+        ];
+
+        const indices = [
+            0, 1, 2,
+            0, 2, 3,
+        ];
+
+        const positionBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
+
+        const indexBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
+gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW);
+
+    gl.enableVertexAttribArray(positionAttributeLocation);
+    gl.vertexAttribPointer(positionAttributeLocation, 3, gl.FLOAT, false, 0, 0);
+
+    const modelMatrix = mat4.create();
+    const viewMatrix = mat4.create();
+    const projectionMatrix = mat4.create();
+
+    mat4.translate(modelMatrix, modelMatrix, [0, 0, -3]);
+    mat4.perspective(projectionMatrix, glMatrix.toRadian(60), canvas.clientWidth / canvas.clientHeight, 0.1, 100.0);
+
+    let angle = 0;
+
+    function render() {
+        requestAnimationFrame(render);
+
+        gl.clearColor(0.0, 0.0, 0.0, 1.0);
+        gl.clear(gl.COLOR_BUFFER_BIT);
+
+        mat4.rotateY(modelMatrix, modelMatrix, glMatrix.toRadian(angle));
+        angle += 1;
+
+        gl.uniformMatrix4fv(modelUniformLocation, false, modelMatrix);
+        gl.uniformMatrix4fv(viewUniformLocation, false, viewMatrix);
+        gl.uniformMatrix4fv(projectionUniformLocation, false, projectionMatrix);
+
+        const r = Math.random();
+        const g = Math.random();
+        const b = Math.random();
+
+        gl.uniform4f(colorUniformLocation, r, g, b, 1.0);
+
+        gl.drawElements(gl.TRIANGLES, indices.length, gl.UNSIGNED_SHORT, 0);
+    }
+
+    render();
+</script>
+</body>
+</html>

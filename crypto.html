@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BTCUSDT Chart</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+    <div style="width: 80%; margin: auto;">
+        <canvas id="btcusdtChart"></canvas>
+    </div>
+
+    <script>
+        async function fetchData() {
+            try {
+                const response = await axios.get('https://api.binance.com/api/v3/klines', {
+                    params: {
+                        symbol: 'BTCUSDT',
+                        interval: '1h',
+                        limit: 100
+                    }
+                });
+
+                return response.data;
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
+        async function createChart() {
+            const data = await fetchData();
+
+            const labels = data.map(d => new Date(d[0]).toLocaleString());
+            const prices = data.map(d => parseFloat(d[4]));
+
+            const ctx = document.getElementById('btcusdtChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'BTCUSDT',
+                        data: prices,
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    scales: {
+                        x: {
+                            display: true,
+                            title: {
+                                display: true,
+                                text: 'Time'
+                            }
+                        },
+                        y: {
+                            display: true,
+                            title: {
+                                display: true,
+                                text: 'Price'
+                            },
+                            ticks: {
+                                beginAtZero: false
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        createChart();
+    </script>
+</body>
+</html>
