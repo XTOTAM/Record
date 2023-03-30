@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML Page Scanner</title>
+</head>
+<body>
+    <h1>HTML Pages List</h1>
+    <ul id="htmlPagesList"></ul>
+
+    <script>
+        async function scanHtmlPages() {
+            const currentPath = window.location.href;
+            const baseUrl = currentPath.substring(0, currentPath.lastIndexOf("/") + 1);
+            const response = await fetch(baseUrl);
+            const text = await response.text();
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(text, "text/html");
+
+            const htmlPagesList = document.getElementById("htmlPagesList");
+            htmlDoc.querySelectorAll("a[href$='.html']").forEach(link => {
+                const listItem = document.createElement("li");
+                const anchor = document.createElement("a");
+                anchor.href = baseUrl + link.getAttribute("href");
+                anchor.innerText = link.innerText || link.getAttribute("href");
+                listItem.appendChild(anchor);
+                htmlPagesList.appendChild(listItem);
+            });
+        }
+
+        scanHtmlPages();
+    </script>
+</body>
+</html>
