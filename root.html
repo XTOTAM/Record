@@ -1,28 +1,50 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Scan URL for endpoints</title>
-	<script>
-		function scanURL() {
-			var currentURL = window.location.href;
-			var endpoints = [];
+  <meta charset="UTF-8">
+  <title>My GitHub Pages Site</title>
+  <style>
+    /* add your CSS code here */
+    nav ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      background-color: #f2f2f2;
+    }
 
-			// Add endpoints to the array
-			endpoints.push(currentURL);
-			endpoints.push(currentURL + "/about");
-			endpoints.push(currentURL + "/contact");
+    nav li {
+      display: inline-block;
+      margin-right: 10px;
+    }
 
-			// Display the endpoints
-			var result = document.getElementById("result");
-			result.innerHTML = "<h2>Endpoints:</h2><ul>";
-			for (var i = 0; i < endpoints.length; i++) {
-				result.innerHTML += "<li>" + endpoints[i] + "</li>";
-			}
-			result.innerHTML += "</ul>";
-		}
-	</script>
+    nav a {
+      display: block;
+      padding: 10px;
+      text-decoration: none;
+      color: #333;
+      font-weight: bold;
+    }
+
+    nav a:hover {
+      background-color: #333;
+      color: #fff;
+    }
+  </style>
 </head>
-<body onload="scanURL()">
-	<div id="result"></div>
+<body>
+  <div id="nav-menu"></div>
+  <script>
+    fetch('./')
+      .then(response => response.text())
+      .then(html => {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        const links = [...doc.querySelectorAll('a')]
+          .filter(link => link.href.endsWith('.html'))
+          .map(link => `<li><a href="${link.href}">${link.textContent}</a></li>`);
+        const navMenu = document.getElementById('nav-menu');
+        navMenu.innerHTML = `<ul>${links.join('')}</ul>`;
+      });
+  </script>
 </body>
 </html>
