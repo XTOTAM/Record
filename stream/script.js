@@ -17,11 +17,21 @@ function calculateStandardDeviation(data) {
   return Math.sqrt(variance);
 }
 
+// Add a variable to keep track of the total traded quantity
+let totalTradedQuantity = 0;
+
 function handleTradeMessage(event) {
   const tradeData = JSON.parse(event.data);
   const tradeInfoElement = document.getElementById('tradeInfo');
+  const totalQuantityElement = document.getElementById('totalQuantity');
   const quantity = parseFloat(tradeData.q);
   const price = parseFloat(tradeData.p);
+  const timestamp = tradeData.T;
+
+  // Update the total traded quantity
+  totalTradedQuantity += quantity;
+  totalQuantityElement.innerHTML = `BTC: ${totalTradedQuantity.toFixed(1)}`;
+
 
   // Add the current trade quantity and price to the rolling windows
   last100TradeQuantities.push(quantity);
@@ -70,7 +80,6 @@ function handleTradeMessage(event) {
   
   const isAnomaly = isQuantityAnomaly && isPriceChangeAnomaly;
   
-  const timestamp = tradeData.T;
 
   // Convert the timestamp to a date and time string
   const date = new Date(timestamp);
