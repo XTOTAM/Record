@@ -11,6 +11,7 @@ function handleTradeMessage(event) {
   const tradeData = JSON.parse(event.data);
   const tradeInfoElement = document.getElementById('tradeInfo');
   const quantity = parseFloat(tradeData.q);
+  const price = parseFloat(tradeData.p);
 
   // Add the current trade quantity to the rolling window
   last100TradeQuantities.push(quantity);
@@ -30,11 +31,15 @@ function handleTradeMessage(event) {
   const barWidth = Math.abs(normalizedQuantity) * 50; // Adjust the multiplier for better visualization
 
   const tradeInfo = `
-    <div style="background-color: ${barColor}; width: ${barWidth}px; height: 20px; margin-bottom: 5px;"></div>
+    <div style="display: flex; align-items: center; margin-bottom: 5px;">
+      <span style="margin-right: 10px;">${price.toFixed(2)}</span>
+      <div style="background-color: ${barColor}; width: ${barWidth}px; height: 20px;"></div>
+    </div>
   `;
 
   tradeInfoElement.innerHTML = tradeInfo + tradeInfoElement.innerHTML;
 }
+
 
 tradeStream.addEventListener('message', handleTradeMessage);
 
