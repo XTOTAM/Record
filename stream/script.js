@@ -5,6 +5,8 @@
 
   // Initialize a rolling window of the last 100 trade quantities
   const last100TradeQuantities = [];
+  const last100TradePrices = [];
+
   const maxTrades = 100;
 
   function calculateStandardDeviation(data) {
@@ -20,17 +22,20 @@
     const quantity = parseFloat(tradeData.q);
     const price = parseFloat(tradeData.p);
   
-    // Add the current trade quantity to the rolling window
+    // Add the current trade quantity and price to the rolling windows
     last100TradeQuantities.push(quantity);
+    last100TradePrices.push(price);
   
-    // If the rolling window exceeds the maximum size, remove the oldest trade quantity
+    // If the rolling windows exceed the maximum size, remove the oldest trade quantity and price
     if (last100TradeQuantities.length > maxTrades) {
       last100TradeQuantities.shift();
+      last100TradePrices.shift();
     }
   
-    // Calculate the average trade quantity and standard deviation
+    // Calculate the average trade quantity, standard deviation, and average price
     const averageQuantity = last100TradeQuantities.reduce((sum, q) => sum + q, 0) / last100TradeQuantities.length;
     const standardDeviation = calculateStandardDeviation(last100TradeQuantities);
+    const averagePrice = last100TradePrices.reduce((sum, p) => sum + p, 0) / last100TradePrices.length;
   
     // Normalize the current trade quantity using the average trade quantity
     const normalizedQuantity = quantity / averageQuantity;
@@ -39,9 +44,20 @@
     const barWidth = Math.abs(normalizedQuantity) * 50; // Adjust the multiplier for better visualization
   
     // Anomaly detection: check if the trade is more than 3 standard deviations away from the mean
-    const anomalyThreshold = 3;
-    const isAnomaly = Math.abs(quantity - averageQuantity) > anomalyThreshold * standardDeviation;
-    const anomalyLabel = isAnomaly ? 'ANOMALY' : '';
+    const quantityAnomalyThreshold = 2;
+    const isQuantityAnomaly = Math.abs(quantity - averageQuantity) > quantityAnomalyThreshold * standardDeviation;
+  
+    // Anomaly detection: check if the price change is more than a certain percentage
+    const priceChangeAnomalyThreshold = 0.0001; // 2% price change
+    const isPriceChangeAnomaly = Math.abs(price - averagePrice) / averagePrice > priceChangeAnomalyThreshold;
+  
+    const isAnomaly = isQuantityAnomaly && isPriceChangeAnomaly;
+     
+    var anomalyLabel = "";
+    if(isAnomaly){
+      anomalyLabel = (price - averagePrice) > 0 ? 'PUMP' : 'DUMP';
+    }
+    
   
     const tradeInfo = `
       <div style="display: flex; align-items: center; margin-bottom: 5px;">
