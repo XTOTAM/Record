@@ -61,11 +61,11 @@ function handleTradeMessage(event) {
   const barWidth = Math.abs(normalizedQuantity) * 50; // Adjust the multiplier for better visualization
 
   // Anomaly detection: check if the trade is more than 2 standard deviations away from the mean
-  const quantityAnomalyThreshold = 1;
+  const quantityAnomalyThreshold = 3;
   const isQuantityAnomaly = Math.abs(quantity - averageQuantity) > quantityAnomalyThreshold * standardDeviation;
 
   // Anomaly detection: check if the price change speed is more than 3 standard deviations away from the mean
-  const priceChangeSpeedAnomalyThreshold = 1;
+  const priceChangeSpeedAnomalyThreshold = 3;
   const isPriceChangeAnomaly = last100PriceChangeSpeeds.length > 0 && Math.abs(last100PriceChangeSpeeds[last100PriceChangeSpeeds.length - 1] - averagePriceChangeSpeed) > priceChangeSpeedAnomalyThreshold * priceChangeSpeedStandardDeviation;
   
   const isAnomaly = isQuantityAnomaly && isPriceChangeAnomaly;
