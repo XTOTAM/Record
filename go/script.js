@@ -21,6 +21,9 @@ canvas.addEventListener('click', (e) => {
     removeSurroundedClusters(boardState, currentPlayer);
 
     currentPlayer = currentPlayer === 'black' ? 'white' : 'black';
+
+    // Redraw the board and update the stone icon
+    drawBoard();
   }
 });
 
@@ -58,7 +61,22 @@ function drawBoard() {
     ctx.lineTo(cellSize * (gridSize - 0.5), cellSize / 2 + i * cellSize);
     ctx.stroke();
   }
+
+  // Draw label for next turn
+  ctx.font = "bold 16px Arial";
+  ctx.textAlign = "center";
+  ctx.fillStyle = "#000";
+  ctx.fillText("Next turn:", 285, 590);
+
+  // Draw stone icon for current player's turn
+  ctx.beginPath();
+  ctx.arc(340, 585, 12, 0, 2 * Math.PI);
+  ctx.fillStyle = currentPlayer;
+  ctx.fill();
+  ctx.stroke();
 }
+
+
 
 function drawStone(row, col, color) {
   ctx.beginPath();
